@@ -1,0 +1,150 @@
+@extends('adminlte::page')
+
+
+@section('template_fastload_css')
+@endsection
+
+@section('template_title')
+    {!! trans('hyplast.showing-all-products') !!}
+@endsection
+
+@section('template_linked_css')
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+
+@endsection
+<!-- Meta -->
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<!-- CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+
+@section('content')
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-boxes"></i>
+                        {!! trans('hyplast.showing-all-products') !!}
+                    </h3>
+                    <div class="card-tools">
+                        <a class="btn btn-success btn-sm" href="/products/create">
+                            <i class="fas fa-plus"></i> {!! trans('hyplast.buttons.create-new3') !!}
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Filtros -->
+                    <div class="row mb-3">
+                        <div class="col-md-2">
+                            <label for="filter_articulo">Código</label>
+                            <input type="text" class="form-control form-control-sm" id="filter_articulo" placeholder="Buscar código...">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="filter_grupo">Grupo</label>
+                            <select class="form-control form-control-sm" id="filter_grupo">
+                                <option value="">Todos</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="filter_familia">Familia</label>
+                            <select class="form-control form-control-sm" id="filter_familia">
+                                <option value="">Todos</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="filter_categoria">Categoría</label>
+                            <select class="form-control form-control-sm" id="filter_categoria">
+                                <option value="">Todos</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="filter_color">Color</label>
+                            <select class="form-control form-control-sm" id="filter_color">
+                                <option value="">Todos</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="filter_material">Material</label>
+                            <select class="form-control form-control-sm" id="filter_material">
+                                <option value="">Todos</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- DataTable -->
+                    <div class="table-responsive">
+                        <table id="data-table" class="table table-bordered table-hover table-striped table-sm">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th class="text-center">#</th>
+                                    <th class="text-center">{!! trans('hyplast.machines-table.code') !!}</th>
+                                    <th>{!! trans('hyplast.machines-table.name') !!}</th>
+                                    <th class="text-center">Grupo</th>
+                                    <th class="text-center">{!! trans('hyplast.machines-table.family') !!}</th>
+                                    <th class="text-center">{!! trans('hyplast.machines-table.category') !!}</th>
+                                    <th class="text-center">{!! trans('forms.create_product_label_color') !!}</th>
+                                    <th class="text-center">{!! trans('forms.create_product_label_material') !!}</th>
+                                    <th class="text-center">Imagen</th>
+                                    <th class="text-center">{!! trans('hyplast.machines-table.actions') !!}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@include('modals.modal-machine')
+@include('modals.modal-supplies')
+@include('modals.modal-imagenes-producto')
+
+
+@endsection
+
+@section('footer_scripts')
+    @include('scripts.datatables.datatables-product')
+    @include('scripts.save-modal-script')
+    @if(config('hyplast.tooltipsEnabled'))
+        @include('scripts.tooltips')
+    @endif
+    @if(config('hyplast.enableSearch'))
+        @include('scripts.searchs.search-products')
+    @endif
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/i18n/es.js"></script>
+
+    <script type="text/javascript">
+        // Configuración Select2 para modal de insumos
+        $("#product2").select2({
+            language: "es",
+            dropdownParent: $('#modalSupplies .modal-body'),
+            ajax: {
+                url: "{{ url('autocomplete/products') }}",
+                type: "post",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        search: params.term
+                    };
+                },
+                processResults: function (response) {
+                    return {
+                        results: response
+                    };
+                },
+                cache: true
+            }
+        });
+    </script>
+
+@endsection
